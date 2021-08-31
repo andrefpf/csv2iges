@@ -77,13 +77,16 @@ class IgesFile:
             return spaces + text
     
 
-def load_csv(filename, plabel='points', llabel='lines'):
+def load_csv(filename, plabel='point', llabel='line', splitter=','):
     points = dict()
     lines = dict()
 
     with open(filename, 'r') as file:
         for line in file.readlines():
-            fields = line.split(';')
+            fields = line.split(splitter)
+
+            if len(fields) < 2:
+                raise ValueError("I can't parse this correctly. Maybe you should change splitter parameter.")
 
             if fields[1] == plabel:
                 id_ = int(fields[0])
@@ -96,7 +99,7 @@ def load_csv(filename, plabel='points', llabel='lines'):
                 lines[id_] = (start, end)
             
             else:
-                raise ValueError('This file have unexpected inputs.')
+                raise ValueError('This file have unexpected inputs. Maybe you should change plabel or llabel parameters.')
 
     return points, lines
 
@@ -104,4 +107,3 @@ def load_csv(filename, plabel='points', llabel='lines'):
 def from_csv(filename, **kwargs):
     points, lines = load_csv(filename, **kwargs)
     return IgesFile(points, lines)
-
